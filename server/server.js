@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const app = express();
 const bodyParser = require('body-parser');
 require('./config/config');
@@ -9,37 +10,28 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-app.get('/usuario', (req, res) => {
-    res.json('get usuario');
-})
 
-app.post('/usuario', (req, res) => {
-    let body = req.body;
+app.use(require('./routes/usuario'));
 
-    if (body.nombre === undefined) {
-        res.status(400).json({
-            ok: false,
-            mensaje: 'El nombre es necesario'
-        });
+
+//Nos conectamos a la base de datos especificando el puerto en el cual esta corriendo nuestra base de datos y el 
+//nombre que queremos para la base
+mongoose.connect(process.env.URLDB, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true }, (err, res) => {
+    if (err) {
+        throw new Error(err);
     } else {
-        res.json({
-            persona: body
-        });
+        console.log('Base de datos online');
     }
-
 });
 
-app.put('/usuario/:id', (req, res) => {
+//Otra manera para conectar a la base de datos 
 
-    let id = req.params.id;
-    res.json({
-        id
-    });
-})
-
-app.delete('/usuario', (req, res) => {
-    res.json('delete usuario');
-})
+//mongoose.connect('mongodb://localhost:27017/cafe', {
+//    useNewUrlParser: true,
+//   useUnifiedTopology: true,
+//   useFindAndModify: false,
+//   useCreateIndex: true
+//});
 
 app.listen(process.env.PORT, () => {
     console.log('Escuchando puerto: ', 3000);
